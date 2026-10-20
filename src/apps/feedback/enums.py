@@ -6,6 +6,22 @@ class StringEnum(str, Enum):
         return self.value
 
 
+class Positions(StringEnum):
+    DEV = ('DEV', 2.2, False)
+    HR = ('HR', 1.2, False)
+    TL = ('TL', 2.6, True)
+    PO = ('PO', 3.0, True)
+    TPM = ('TPM', 3.5, True)
+    CTO = ('CTO', 4.0, True)
+
+    def __new__(cls, value, coefficient, is_manager):
+        instance = str.__new__(cls, value)
+        instance._value_ = value
+        instance.coefficient = coefficient
+        instance.isManager = is_manager
+        return instance
+
+
 class Codes(StringEnum):
     SUCCESS = 'success'
     FAILED = 'failed'

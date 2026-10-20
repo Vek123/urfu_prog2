@@ -1,4 +1,4 @@
-.PHONY: run-server run-rest run-service1 run-service2
+.PHONY: run-server run-rest run-service1 run-service2 test
 
 run-server:
 	python ./src/manage.py runserver
@@ -11,3 +11,6 @@ run-service1:
 
 run-service2:
 	python ./service2/src/manage.py runserver 127.0.0.1:8084
+
+test:
+	python ./src/manage.py test
