@@ -31,3 +31,17 @@ class Discipline(models.Model):
         constraints = [models.CheckConstraint(
             condition=models.Q(hours__gte=1, hours__lte=10000),
             name='discipline_hours_1_10000')]
+
+
+class StudyGroup(models.Model):
+    name = models.CharField('Номер группы', max_length=32, unique=True)
+    faculty = models.CharField('Факультет', max_length=20)
+    course = models.PositiveSmallIntegerField(
+        'Курс', validators=[MinValueValidator(1), MaxValueValidator(6)])
+
+    class Meta:
+        db_table = 'study_groups'
+        ordering = ['name', 'id']
+        constraints = [models.CheckConstraint(
+            condition=models.Q(course__gte=1, course__lte=6),
+            name='study_group_course_1_6')]

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'apps.education.monitoring.RequestMetricsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

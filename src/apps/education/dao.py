@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from .models import Discipline, Student
+from .models import Discipline, Student, StudyGroup
 
 
 class ResourceDAO(ABC):
@@ -44,3 +44,7 @@ class StudentDAO(DjangoResourceDAO):
 
 class DisciplineDAO(DjangoResourceDAO):
     model = Discipline
+
+
+class StudyGroupDAO(DjangoResourceDAO):
+    model = StudyGroup
