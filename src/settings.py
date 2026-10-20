@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'apps.hello',
     'apps.feedback',
+    'apps.education',
 ]
 
 MIDDLEWARE = [
