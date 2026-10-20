@@ -16,6 +16,7 @@ class ErrorCodes(StringEnum):
     VALIDATION_EXCEPTION = 'ValidationException'
     UNSUPPORTED_EXCEPTION = 'UnsupportedCodeException'
     UNKNOWN_EXCEPTION = 'UnknownException'
+    DOWNSTREAM_EXCEPTION = 'DownstreamServiceException'
 
 
 class ErrorMessages(StringEnum):
@@ -23,12 +24,14 @@ class ErrorMessages(StringEnum):
     VALIDATION = 'Ошибка валидации'
     UNSUPPORTED = 'Не поддерживаемая ошибка'
     UNKNOWN = 'Произошла непредвиденная ошибка'
+    DOWNSTREAM = 'Ошибка обращения к Сервису 2'
 
 
 class Systems(StringEnum):
     ERP = 'ERP'
     CRM = 'CRM'
     WMS = 'WMS'
+    SERVICE1 = 'Service 1'
 
     @property
     def description(self):
@@ -36,4 +39,5 @@ class Systems(StringEnum):
             self.ERP: 'Enterprise Resource Planning',
             self.CRM: 'Customer Relationship Management',
             self.WMS: 'Warehouse Management System',
+            self.SERVICE1: 'First REST service',
         }[self]

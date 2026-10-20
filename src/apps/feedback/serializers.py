@@ -1,5 +1,6 @@
 from typing import ClassVar
 
+from django.conf import settings
 from rest_framework import serializers
 
 from .enums import Systems
@@ -30,7 +31,10 @@ class StrictIntegerField(serializers.IntegerField):
 
 class SystemsField(serializers.ChoiceField):
     def __init__(self, **kwargs):
-        super().__init__(choices=[system.value for system in Systems], **kwargs)
+        choices = [system.value for system in Systems
+                   if system != Systems.SERVICE1
+                   or settings.FEEDBACK_ALLOW_SERVICE_SYSTEM]
+        super().__init__(choices=choices, **kwargs)
 
     def to_internal_value(self, data):
         return Systems(super().to_internal_value(data))

@@ -1,6 +1,8 @@
 import os
 import sys
 from pathlib import Path
+from urllib.parse import urlsplit
+from math import isfinite
 
 from django.core.exceptions import ImproperlyConfigured
 from environ import Env
@@ -108,12 +110,23 @@ if FEEDBACK_RESPONSE_MODIFIER not in ('systemTime', 'operationUid'):
     raise ImproperlyConfigured(
         'FEEDBACK_RESPONSE_MODIFIER must be systemTime or operationUid')
 
+FEEDBACK_SERVICE_NAME = 'Service 1'
+FEEDBACK_FORWARD_REQUESTS = True
+FEEDBACK_ALLOW_SERVICE_SYSTEM = False
+SERVICE2_URL = env.str('SERVICE2_URL', default='http://127.0.0.1:8084/feedback')
+SERVICE2_TIMEOUT = env.float('SERVICE2_TIMEOUT', default=5.0)
+if not isfinite(SERVICE2_TIMEOUT) or SERVICE2_TIMEOUT <= 0:
+    raise ImproperlyConfigured('SERVICE2_TIMEOUT must be a positive finite number')
+if urlsplit(SERVICE2_URL).scheme not in ('http', 'https') or not urlsplit(SERVICE2_URL).netloc:
+    raise ImproperlyConfigured('SERVICE2_URL must be an absolute HTTP(S) URL')
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'console': {
-            'format': '{asctime} {levelname} {name} {message}',
+            'format': ('{asctime} {levelname} ' + FEEDBACK_SERVICE_NAME
+                       + ' {name} {message}'),
             'style': '{',
         },
     },

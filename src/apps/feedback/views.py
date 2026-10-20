@@ -1,4 +1,5 @@
 import logging
+from time import time_ns
 
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
@@ -9,10 +10,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
 from .enums import ErrorCodes, ErrorMessages
-from .exceptions import UnsupportedCodeException
+from .exceptions import DownstreamServiceException, UnsupportedCodeException
+from .forwarding import (ForwardRequestService, ModifySourceRequestService,
+                         ModifySystemNameRequestService)
 from .models import FeedbackRequest, FeedbackResponse
 from .serializers import FeedbackRequestSerializer, FeedbackResponseSerializer
 from .services import RESPONSE_MODIFIERS, FeedbackService
+from .timing import log_delivery_timing
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +27,11 @@ def feedback_exception_handler(error, context):
     if isinstance(error, UnsupportedCodeException):
         error_code = ErrorCodes.UNSUPPORTED_EXCEPTION
         message = ErrorMessages.UNSUPPORTED
+    elif isinstance(error, DownstreamServiceException):
+        error_code = ErrorCodes.DOWNSTREAM_EXCEPTION
+        message = ErrorMessages.DOWNSTREAM
+        details = str(error.detail)
+        logger.error('Forwarding failed: %s', details)
     elif response is not None:
         error_code = ErrorCodes.VALIDATION_EXCEPTION
         if isinstance(error, ValidationError) and isinstance(error.detail, dict):
@@ -60,6 +69,10 @@ class FeedbackView(APIView):
     permission_classes = (AllowAny,)
     http_method_names = ('post', 'options')
 
+    def dispatch(self, request, *args, **kwargs):
+        self.received_at_ns = time_ns()
+        return super().dispatch(request, *args, **kwargs)
+
     def get_exception_handler(self):
         return feedback_exception_handler
 
@@ -67,12 +80,19 @@ class FeedbackView(APIView):
         logger.info('Request received: %s %s', request.method, request.path)
         self.payload = request.data
         logger.info('Incoming request: %s', self.payload)
+        if not settings.FEEDBACK_FORWARD_REQUESTS:
+            log_delivery_timing(request, self.received_at_ns)
         serializer = FeedbackRequestSerializer(data=self.payload)
         serializer.is_valid(raise_exception=True)
         message = FeedbackRequest(**serializer.validated_data)
         logger.info('Validated request: %s', message)
         modifier = RESPONSE_MODIFIERS[settings.FEEDBACK_RESPONSE_MODIFIER]()
         result = FeedbackService(modifier).handle(message)
+        if settings.FEEDBACK_FORWARD_REQUESTS:
+            forwarder = ForwardRequestService(
+                settings.SERVICE2_URL, settings.SERVICE2_TIMEOUT,
+                (ModifySystemNameRequestService(), ModifySourceRequestService()))
+            forwarder.send(message, self.received_at_ns)
         data = FeedbackResponseSerializer(result).data
         logger.info('uid=%s response status=200 body=%s', message.uid, data)
         return Response(data)
