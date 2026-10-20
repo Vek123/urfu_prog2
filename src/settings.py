@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from environ import Env
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -100,3 +101,38 @@ LOCALE_PATHS = [
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+FEEDBACK_RESPONSE_MODIFIER = env.str(
+    'FEEDBACK_RESPONSE_MODIFIER', default='systemTime')
+if FEEDBACK_RESPONSE_MODIFIER not in ('systemTime', 'operationUid'):
+    raise ImproperlyConfigured(
+        'FEEDBACK_RESPONSE_MODIFIER must be systemTime or operationUid')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '{asctime} {levelname} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    'loggers': {
+        'apps.feedback': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
