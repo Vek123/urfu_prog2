@@ -12,15 +12,34 @@
 <body>
 <nav class="navbar bg-body-tertiary border-bottom" aria-label="Основная навигация">
     <div class="container gap-3">
-        <span class="navbar-brand mb-0">Учебные справочники</span>
+        <a class="navbar-brand mb-0" href="{% url 'education:index' %}">Учебные справочники</a>
         <div class="nav nav-pills">
+            {% if user.is_authenticated %}
             <a class="nav-link{% if kind == 'students' %} active{% endif %}"
                href="{% url 'education:web-student-list' %}"
                {% if kind == 'students' %}aria-current="page"{% endif %}>Студенты</a>
             <a class="nav-link{% if kind == 'groups' %} active{% endif %}"
                href="{% url 'education:web-group-list' %}"
                {% if kind == 'groups' %}aria-current="page"{% endif %}>Учебные группы</a>
+            {% if can_view_users %}
+            <a class="nav-link{% if kind == 'users' %} active{% endif %}"
+               href="{% url 'education:users' %}"
+               {% if kind == 'users' %}aria-current="page"{% endif %}>Пользователи</a>
+            {% endif %}
+            {% else %}
+            <a class="nav-link" href="{% url 'education:login' %}">Вход</a>
+            <a class="nav-link" href="{% url 'education:register' %}">Регистрация</a>
+            {% endif %}
         </div>
+        {% if user.is_authenticated %}
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="text-break">{{ user.email|default:user.username }}</span>
+            <form method="post" action="{% url 'education:logout' %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-secondary" type="submit">Выйти</button>
+            </form>
+        </div>
+        {% endif %}
     </div>
 </nav>
 <main class="container py-4">

@@ -1,0 +1,16 @@
+{% extends 'education/base.html' %}
+{% block content %}
+<div class="p-4 p-md-5 bg-body-tertiary rounded-3">
+    <h1 class="display-6">Учебные справочники</h1>
+    <p class="lead">Управление списком студентов и учебными группами.</p>
+    {% if user.is_authenticated %}
+    <a class="btn btn-primary" href="{% url 'education:web-student-list' %}">Открыть студентов</a>
+    {% else %}
+    <p>Войдите в учётную запись или зарегистрируйтесь для работы со справочниками.</p>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary" href="{% url 'education:login' %}">Войти</a>
+        <a class="btn btn-outline-primary" href="{% url 'education:register' %}">Зарегистрироваться</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

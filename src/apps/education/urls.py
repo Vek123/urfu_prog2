@@ -1,12 +1,19 @@
 from django.urls import path
 
-from . import monitoring, web_views
+from . import auth_views, monitoring, web_views
 
 from .views import (DisciplineCollectionView, DisciplineDetailView,
                     StudentCollectionView, StudentDetailView)
 
 app_name = 'education'
 urlpatterns = [
+    path('', auth_views.IndexView.as_view(), name='home'),
+    path('index', auth_views.IndexView.as_view(), name='index'),
+    path('register', auth_views.RegistrationView.as_view(), name='register'),
+    path('register/save', auth_views.RegistrationSaveView.as_view(), name='register-save'),
+    path('login', auth_views.LoginView.as_view(), name='login'),
+    path('logout', auth_views.LogoutView.as_view(), name='logout'),
+    path('users', auth_views.UsersView.as_view(), name='users'),
     path('api/students', StudentCollectionView.as_view(), name='student-list'),
     path('api/students/<int:item_id>', StudentDetailView.as_view(), name='student-detail'),
     path('api/disciplines', DisciplineCollectionView.as_view(), name='discipline-list'),

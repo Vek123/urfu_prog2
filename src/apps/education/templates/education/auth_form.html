@@ -1,0 +1,41 @@
+{% extends 'education/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h1 class="h2 mb-4">{{ title }}</h1>
+        {% if success %}
+        <div class="alert alert-success" role="status">Регистрация завершена.
+            <a class="alert-link" href="{% url 'education:login' %}">Войдите в учётную запись.</a>
+        </div>
+        {% endif %}
+        {% if logged_out %}
+        <div class="alert alert-success" role="status">Вы вышли из учётной записи.</div>
+        {% endif %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <form method="post" action="{{ action_url }}">
+            {% csrf_token %}
+            {% if not registration %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                {% if field.errors %}
+                <div class="invalid-feedback d-block" id="{{ field.auto_id }}_error">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button class="btn btn-primary" type="submit">{{ button }}</button>
+        </form>
+        <p class="mt-3">
+        {% if registration %}
+            Уже есть учётная запись? <a href="{% url 'education:login' %}">Войти</a>
+        {% else %}
+            Нет учётной записи? <a href="{% url 'education:register' %}">Зарегистрироваться</a>
+        {% endif %}
+        </p>
+    </div>
+</div>
+{% endblock %}

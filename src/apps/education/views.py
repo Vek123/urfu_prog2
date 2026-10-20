@@ -1,7 +1,8 @@
 import logging
 
 from rest_framework.parsers import JSONParser
-from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
@@ -34,8 +35,8 @@ def education_exception_handler(error, context):
 class ResourceView(APIView):
     parser_classes = (JSONParser,)
     renderer_classes = (JSONRenderer,)
-    authentication_classes = ()
-    permission_classes = (AllowAny,)
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
     service_class = None
 
     def get_exception_handler(self):

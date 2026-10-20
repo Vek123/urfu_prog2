@@ -1,6 +1,9 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
 
 from .form_services import StudentFormService, StudyGroupFormService
@@ -33,7 +36,8 @@ def _identifier(value):
 
 
 
-class ResourceTemplateView(TemplateView):
+@method_decorator(never_cache, name='dispatch')
+class ResourceTemplateView(LoginRequiredMixin, TemplateView):
     kind = None
     http_method_names = ('get',)
 
