@@ -14,3 +14,11 @@ run-service2:
 
 test:
 	python ./src/manage.py test
+
+.PHONY: run-coursework migrate-coursework
+
+run-coursework:
+	python ./coursework/src/manage.py runserver 127.0.0.1:8086
+
+migrate-coursework:
+	python ./coursework/src/manage.py migrate

@@ -1,0 +1,11 @@
+{% extends 'music/base.html' %}
+
+{% block content %}
+    <h1 class="h2">{{ title }}</h1>
+    <div class="alert alert-danger" role="alert">
+        {% for error in errors %}
+            <p class="mb-0">{{ error }}</p>
+        {% endfor %}
+    </div>
+    <a class="btn btn-outline-secondary" href="{{ back_url }}">Вернуться к списку</a>
+{% endblock %}

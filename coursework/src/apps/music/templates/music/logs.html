@@ -1,0 +1,42 @@
+{% extends 'music/base.html' %}
+
+{% block content %}
+    <h1 class="h2">Журнал действий</h1>
+    <p class="text-body-secondary">
+        {% if is_admin %}
+            Действия всех пользователей.
+        {% else %}
+            Ваши действия.
+        {% endif %}
+        Время отображается по Екатеринбургу.
+    </p>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Дата и время</th>
+                    <th>Пользователь</th>
+                    <th>Действие</th>
+                    <th>Описание</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in page_obj %}
+                    <tr>
+                        <td>{{ entry.id }}</td>
+                        <td>{{ entry.date_actions|date:'d.m.Y H:i:s' }}</td>
+                        <td>{{ entry.username_snapshot }}</td>
+                        <td>{{ entry.action }}</td>
+                        <td class="text-break">{{ entry.description }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">Действий пока нет.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'music/pagination.html' %}
+{% endblock %}

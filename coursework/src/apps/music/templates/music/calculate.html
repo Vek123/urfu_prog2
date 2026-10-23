@@ -1,0 +1,21 @@
+{% extends 'music/base.html' %}
+
+{% block content %}
+    <div class="col-md-9 col-lg-7">
+        <h1 class="h2 mb-3">Расчёт дохода</h1>
+        <p>
+            Доход = число прослушиваний × ставка за прослушивание. Итог округляется до копеек.
+            Расчёт не меняет записи каталога.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            {% include 'music/fields.html' %}
+            <button class="btn btn-primary" type="submit">Рассчитать</button>
+        </form>
+        {% if income is not None %}
+            <div class="alert alert-success mt-4" role="status">
+                Расчётный доход: <strong>{{ income }} ₽</strong>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

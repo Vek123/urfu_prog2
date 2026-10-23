@@ -1,0 +1,34 @@
+{% extends 'music/base.html' %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <h1 class="h2 mb-3">{{ title }}</h1>
+            {% if registration %}
+                <p class="text-body-secondary">
+                    Новая учётная запись получает роль READ_ONLY. Для изменения каталога обратитесь
+                    к администратору.
+                </p>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                {% include 'music/fields.html' %}
+                <button class="btn btn-primary" type="submit">
+                    {% if registration %}
+                        Зарегистрироваться
+                    {% else %}
+                        Войти
+                    {% endif %}
+                </button>
+            </form>
+            <p class="mt-3">
+                {% if registration %}
+                    <a href="/login">Уже есть учётная запись? Войти</a>
+                {% else %}
+                    <a href="/register">Создать учётную запись</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+{% endblock %}

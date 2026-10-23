@@ -1,0 +1,44 @@
+{% extends 'music/base.html' %}
+
+{% block content %}
+    <h1 class="h2">Назначение ролей</h1>
+    <p>
+        Выбранная роль заменяет текущую роль пользователя. ADMIN имеет полный доступ; USER изменяет
+        свои записи; READ_ONLY только читает каталог.
+    </p>
+    <div class="col-md-9 col-lg-6">
+        <form method="post">
+            {% csrf_token %}
+            {% include 'music/fields.html' %}
+            <button class="btn btn-primary" type="submit">Назначить роль</button>
+        </form>
+    </div>
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Пользователь</th>
+                    <th>Роль</th>
+                    <th>Активен</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account, role in accounts %}
+                    <tr>
+                        <td>{{ account.id }}</td>
+                        <td>{{ account.username }}</td>
+                        <td>
+                            {{ role }}
+                            {% if account.is_superuser %}
+                                (суперпользователь)
+                            {% endif %}
+                        </td>
+                        <td>{{ account.is_active|yesno:'Да,Нет' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'music/pagination.html' %}
+{% endblock %}
