@@ -190,7 +190,6 @@ class CatalogFormView(SecureView):
                     else "Запись с такими данными уже существует.",
                 )
             else:
-                request.audit_logged = True
                 messages.success(
                     request,
                     "Изменения сохранены." if "pk" in kwargs else "Запись добавлена.",
@@ -225,7 +224,6 @@ class CatalogDeleteView(SecureView):
                 },
                 status=400,
             )
-        request.audit_logged = True
         messages.success(request, "Запись удалена.")
         return redirect(self.list_url_name)
 
@@ -257,7 +255,6 @@ class LoginView(TemplateView):
         if form.is_valid():
             login(request, form.get_user())
             audit(request.user, "LOGIN", "Успешный вход")
-            request.audit_logged = True
             target = request.POST.get("next", "")
             return redirect(
                 target
@@ -267,7 +264,6 @@ class LoginView(TemplateView):
                 else "/songs"
             )
         audit(None, "LOGIN_FAILED", "Неверные или отключённые учётные данные")
-        request.audit_logged = True
         context = self.get_context_data(**kwargs)
         context["form"] = form
         return self.render_to_response(context, status=400)
@@ -286,7 +282,6 @@ class RegisterView(LoginView):
             except IntegrityError:
                 form.add_error("username", "Имя пользователя уже занято.")
             else:
-                request.audit_logged = True
                 messages.success(
                     request,
                     "Регистрация завершена. Войдите в учётную запись. Ваша роль — READ_ONLY.",
@@ -303,7 +298,6 @@ class LogoutView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         audit(request.user, "LOGOUT", "Выход из учётной записи")
-        request.audit_logged = True
         logout(request)
         messages.success(request, "Вы вышли из учётной записи.")
         return redirect("/login")
@@ -329,7 +323,6 @@ class CalculationView(SecureView):
                 "CALCULATE",
                 "Расчёт дохода по числу прослушиваний и ставке",
             )
-            request.audit_logged = True
         return self.render_to_response(context, status=200 if form.is_valid() else 400)
 
 
@@ -377,7 +370,6 @@ class RolesView(SecureView):
             except ValidationError as error:
                 form.add_error(None, error)
             else:
-                request.audit_logged = True
                 messages.success(request, "Роль назначена.")
                 return redirect("/roles")
         context = self.get_context_data(**kwargs)

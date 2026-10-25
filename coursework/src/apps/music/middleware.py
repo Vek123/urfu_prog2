@@ -1,8 +1,22 @@
 import logging
+from time import perf_counter
 
 from django.db import DatabaseError
 
+from .monitoring import record_request
 from .services import audit
+
+
+class MetricsMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        begin = perf_counter()
+        try:
+            return self.get_response(request)
+        finally:
+            record_request(perf_counter() - begin)
 
 
 class AuditMiddleware:
@@ -10,29 +24,24 @@ class AuditMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        before = request.user if request.user.is_authenticated else None
+        if request.path.startswith("/static/") or request.path == "/actuator/health":
+            return self.get_response(request)
+
+        description = f"{request.method} {request.path[:250]}"
+        self.log(request, "REQUEST", description)
         response = self.get_response(request)
-        if (
-            request.path.startswith("/static/")
-            or request.path == "/actuator/health"
-            or getattr(request, "audit_logged", False)
-        ):
-            return response
-        user = request.user if request.user.is_authenticated else before
-        if user is not None or response.status_code >= 400:
-            action = (
-                "DENIED"
-                if response.status_code in (401, 403, 404)
-                else ("INVALID_REQUEST" if response.status_code >= 400 else "VIEW")
+        if response.status_code >= 400:
+            self.log(
+                request,
+                "RESPONSE",
+                f"{description}; status={response.status_code}",
             )
-            try:
-                audit(
-                    user,
-                    action,
-                    f"{request.method} {request.path[:250]}; status={response.status_code}",
-                )
-            except DatabaseError:
-                logging.getLogger("apps.music.actions").exception(
-                    "Audit database unavailable"
-                )
         return response
+
+    def log(self, request, action, description):
+        try:
+            audit(request.user, action, description)
+        except DatabaseError:
+            logging.getLogger("apps.music.actions").exception(
+                "Audit database unavailable"
+            )

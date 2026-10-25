@@ -24,7 +24,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "apps.music.monitoring.MetricsMiddleware",
+    "apps.music.middleware.MetricsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

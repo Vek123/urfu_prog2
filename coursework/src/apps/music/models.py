@@ -26,7 +26,9 @@ class Artist(models.Model):
         ordering = ("name", "id")
         constraints: ClassVar = [
             models.UniqueConstraint(
-                fields=("owner", "name"), name="artist_owner_name_unique"
+                fields=("owner", "name"),
+                name="artist_owner_name_unique",
+                violation_error_message="Исполнитель с таким именем уже есть в вашем каталоге.",
             )
         ]
 

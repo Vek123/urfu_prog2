@@ -56,7 +56,6 @@ class CatalogAPIMixin:
             raise serializers.ValidationError(
                 "Запись с такими данными уже существует."
             ) from error
-        self.request._request.audit_logged = True
 
     def perform_create(self, serializer):
         self.save_serializer(serializer)
@@ -69,7 +68,6 @@ class CatalogAPIMixin:
             self.service_class().delete(self.request.user, instance.pk)
         except DjangoValidationError as error:
             raise serializers.ValidationError(error.messages) from error
-        self.request._request.audit_logged = True
 
 
 class CatalogListAPIView(CatalogAPIMixin, generics.ListCreateAPIView):

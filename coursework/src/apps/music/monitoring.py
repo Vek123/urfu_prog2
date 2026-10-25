@@ -16,21 +16,12 @@ count = 0
 total = maximum = 0.0
 
 
-class MetricsMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        global count, total, maximum
-        begin = perf_counter()
-        try:
-            return self.get_response(request)
-        finally:
-            elapsed = perf_counter() - begin
-            with lock:
-                count += 1
-                total += elapsed
-                maximum = max(maximum, elapsed)
+def record_request(elapsed):
+    global count, total, maximum
+    with lock:
+        count += 1
+        total += elapsed
+        maximum = max(maximum, elapsed)
 
 
 class AdminPermission(BasePermission):
