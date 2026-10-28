@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, serializers
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
@@ -93,17 +94,21 @@ class ArtistAPIMixin:
     service_class = ArtistService
 
 
+@extend_schema(tags=["Песни"])
 class SongListAPIView(SongAPIMixin, CatalogListAPIView):
     pass
 
 
+@extend_schema(tags=["Песни"])
 class SongDetailAPIView(SongAPIMixin, CatalogDetailAPIView):
     pass
 
 
+@extend_schema(tags=["Исполнители"])
 class ArtistListAPIView(ArtistAPIMixin, CatalogListAPIView):
     pass
 
 
+@extend_schema(tags=["Исполнители"])
 class ArtistDetailAPIView(ArtistAPIMixin, CatalogDetailAPIView):
     pass

@@ -16,7 +16,7 @@ urlpatterns = [
     path("actuator/info", monitoring.InfoView.as_view(), name="info"),
     path("actuator/metrics", monitoring.MetricsView.as_view(), name="metrics"),
     path(
-        "actuator/metrics/<str:metric>", monitoring.MetricsView.as_view(), name="metric"
+        "actuator/metrics/<str:metric>", monitoring.MetricView.as_view(), name="metric"
     ),
     path("songs", web_views.SongListView.as_view(), name="songs"),
     path("songs/add", web_views.SongFormView.as_view(), name="songs-add"),

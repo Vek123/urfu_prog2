@@ -3,6 +3,8 @@ from time import perf_counter
 
 import django
 from django.db import DatabaseError, connection
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import AllowAny, BasePermission
 from rest_framework.response import Response
@@ -34,6 +36,11 @@ class HealthView(APIView):
     permission_classes = (AllowAny,)
     http_method_names = ("get", "head", "options")
 
+    @extend_schema(
+        tags=["Мониторинг"],
+        summary="Проверка доступности приложения и базы данных",
+        responses={200: OpenApiTypes.OBJECT, 503: OpenApiTypes.OBJECT},
+    )
     def get(self, request):
         try:
             with connection.cursor() as cursor:
@@ -49,6 +56,11 @@ class InfoView(APIView):
     permission_classes = (AdminPermission,)
     http_method_names = ("get", "head", "options")
 
+    @extend_schema(
+        tags=["Мониторинг"],
+        summary="Информация о приложении",
+        responses=OpenApiTypes.OBJECT,
+    )
     def get(self, request):
         return Response(
             {
@@ -63,10 +75,24 @@ class InfoView(APIView):
 
 
 class MetricsView(InfoView):
-    def get(self, request, metric=None):
-        names = ("http.server.requests", "process.uptime")
-        if metric is None:
-            return Response({"names": names})
+    @extend_schema(
+        tags=["Мониторинг"],
+        summary="Список доступных метрик",
+        operation_id="actuator_metrics_list",
+        responses=OpenApiTypes.OBJECT,
+    )
+    def get(self, request):
+        return Response({"names": ("http.server.requests", "process.uptime")})
+
+
+class MetricView(InfoView):
+    @extend_schema(
+        tags=["Мониторинг"],
+        summary="Значения выбранной метрики",
+        operation_id="actuator_metric_retrieve",
+        responses={200: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
+    )
+    def get(self, request, metric):
         if metric == "process.uptime":
             values = [("VALUE", perf_counter() - started)]
         elif metric == "http.server.requests":

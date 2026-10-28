@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_spectacular",
     "apps.music",
 ]
 
@@ -112,4 +113,18 @@ LOGGING = {
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "API музыкального каталога",
+    "DESCRIPTION": (
+        "Каталог песен и исполнителей. Для выполнения запросов войдите через /login "
+        "в этом браузере. READ_ONLY разрешает чтение всего каталога, USER — работу "
+        "со своими записями, ADMIN — работу со всем каталогом. "
+        "Диагностика /actuator/info и /actuator/metrics доступна ADMIN."
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
 }
